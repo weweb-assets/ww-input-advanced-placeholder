@@ -92,12 +92,13 @@ export default {
         uid: { type: String, required: true },
         wwElementState: { type: Object, required: true },
     },
-    emits: ['trigger-event', 'add-state', 'remove-state'],
+    emits: ['trigger-event', 'add-state', 'remove-state', 'update:content:effect'],
     setup(props) {
         const type = computed(() => {
             if (Object.keys(props.wwElementState.props).includes('type')) {
                 return props.wwElementState.props.type;
             }
+
             return props.content.type;
         });
         const step = computed(() => {
@@ -123,6 +124,10 @@ export default {
 
         const inputRef = ref('input');
 
+        /* wwEditor:start */
+        const { createElement } = wwLib.useCreateElement();
+        /* wwEditor:end */
+
         return {
             variableValue,
             setValue,
@@ -130,6 +135,9 @@ export default {
             step,
             type,
             inputRef,
+            /* wwEditor:start */
+            createElement,
+            /* wwEditor:end */
         };
     },
     data() {
@@ -329,6 +337,30 @@ export default {
                 } else {
                     this.$emit('remove-state', 'focus');
                 }
+            },
+        },
+        // This is to support legacy advancedPlaceholder
+        'content.advancedPlaceholder': {
+            async handler(value) {
+                this.$nextTick(() => {
+                    this.handleObserver();
+                });
+
+                /* wwEditor:start */
+                if (this.wwEditorState.isACopy) {
+                    return;
+                }
+
+                let placeholderElement = null;
+
+                if (value) {
+                    placeholderElement = await this.createElement('ww-text', {
+                        _state: { name: 'Placeholder' },
+                    });
+                }
+
+                this.$emit('update:content:effect', { placeholderElement });
+                /* wwEditor:end */
             },
         },
     },

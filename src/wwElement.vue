@@ -446,19 +446,17 @@ export default {
 
 <style lang="scss" scoped>
 .ww-input-basic {
-    width: 100%;
-    height: 100%;
     position: relative;
+    isolation: isolate;
 
     /* wwEditor:start */
-    &.editing:after {
+    &.editing::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
+        display: block;
         pointer-events: initial;
+        z-index: 10;
     }
     /* wwEditor:end */
 

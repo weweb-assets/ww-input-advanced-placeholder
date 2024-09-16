@@ -79,6 +79,8 @@ const INPUT_STYLE_PROPERTIES = [
     'borderRadius',
     'background',
     'height',
+    'boxShadow',
+    'cursor',
 ];
 
 export default {
@@ -191,6 +193,7 @@ export default {
 
             if (this.content.forceAnimation && this.isEditing) return animatedPosition;
             if (this.value || this.value === 0) return animatedPosition;
+            animatedPosition.cursor = this.$attrs?.style?.cursor || 'text';
             if (this.isDebouncing) return animatedPosition;
             if (this.content.animationTrigger === 'focus' && this.isFocused) return animatedPosition;
 
@@ -201,6 +204,7 @@ export default {
                 transform: 'translate3d(0, 0%, 0) scale(1)',
                 transformOrigin: 'left',
                 transition,
+                cursor: this.$attrs?.style?.cursor || 'text',
             };
         },
         rootBinding() {
@@ -482,13 +486,15 @@ export default {
     isolation: isolate;
 
     /* wwEditor:start */
-    &.editing::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        display: block;
-        pointer-events: initial;
-        z-index: 10;
+    &.editing {
+        &::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            display: block;
+            pointer-events: initial;
+            z-index: 10;
+        }
     }
     /* wwEditor:end */
 
@@ -538,7 +544,6 @@ export default {
 
     &__placeholder {
         position: absolute;
-        cursor: text;
         height: fit-content;
     }
 }

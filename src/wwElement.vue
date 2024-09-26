@@ -5,7 +5,7 @@
             v-if="content.type !== 'textarea'"
             :key="'ww-input-basic-' + step"
             ref="input"
-            v-bind="wwElementState.props.attributes || {}"
+            v-bind="inputBinding"
             :value="value"
             class="ww-input-basic__input"
             :class="[
@@ -34,7 +34,7 @@
             v-else
             ref="input"
             :id="$attrs.id"
-            v-bind="wwElementState.props.attributes || {}"
+            v-bind="inputBinding"
             :value="value"
             class="ww-input-basic__input"
             :class="$attrs.class"
@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue';
+import { computed, ref, inject } from 'vue';
 
 const INPUT_STYLE_PROPERTIES = [
     'padding',
@@ -78,7 +78,6 @@ const INPUT_STYLE_PROPERTIES = [
     'borderBottom',
     'borderRadius',
     'background',
-    'height',
     'boxShadow',
     'cursor',
 ];
@@ -126,6 +125,8 @@ export default {
 
         const inputRef = ref('input');
 
+        const state = inject('componentState', {});
+
         /* wwEditor:start */
         const { createElement } = wwLib.useCreateElement();
         /* wwEditor:end */
@@ -137,6 +138,7 @@ export default {
             step,
             type,
             inputRef,
+            state,
             /* wwEditor:start */
             createElement,
             /* wwEditor:end */
@@ -212,14 +214,28 @@ export default {
             INPUT_STYLE_PROPERTIES.forEach(property => {
                 delete style[property];
             });
+            let rootAttrs = {};
+            for (const key in this.$attrs) {
+                if ((this.state?.attributes || []).some(attr => attr.name === key)) {
+                    continue;
+                }
+                rootAttrs[key] = this.$attrs[key];
+            }
             const bindings = {
-                ...this.$attrs,
+                ...rootAttrs,
                 style,
             };
             delete bindings.id;
             delete bindings.class;
 
             return bindings;
+        },
+        inputBinding() {
+            let attrs = (this.state?.attributes || []).reduce((acc, attr) => {
+                acc[attr.name] = attr.value;
+                return acc;
+            }, {});
+            return { ...attrs, ...(this.wwElementState.props.attributes || {}) };
         },
         style() {
             const style = {

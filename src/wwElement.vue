@@ -57,7 +57,6 @@
             @click="focusInput"
         >
             <wwElement
-                style="pointerevents: none"
                 v-bind="content.placeholderElement"
                 :states="value === 0 || (value && value.length) ? ['active'] : []"
                 :ww-props="{ text: wwLang.getText(content.placeholder) }"
@@ -475,12 +474,27 @@ export default {
             if (!el || !placeholder) return;
             this.noTransition = true;
 
-            const pos =
-                this.content.type === 'textarea'
-                    ? wwLib.wwUtils.getLengthUnit(el.style.paddingTop)[0]
-                    : el.clientHeight / 2 - placeholder.clientHeight / 2;
-            this.placeholderPosition.top = pos + 'px';
-            this.placeholderPosition.left = el.style.paddingLeft;
+            const computedStyle = window.getComputedStyle(el);
+            const paddingTop = parseFloat(computedStyle.paddingTop);
+            const paddingBottom = parseFloat(computedStyle.paddingBottom);
+            const paddingLeft = parseFloat(computedStyle.paddingLeft);
+
+            if (this.content.type === 'textarea') {
+                this.placeholderPosition.top = `${paddingTop}px`;
+            } else {
+                const inputHeight = el.clientHeight;
+                const placeholderHeight = placeholder.clientHeight;
+                const availableHeight = inputHeight - paddingTop - paddingBottom;
+
+                if (availableHeight >= placeholderHeight) {
+                    const topPosition = paddingTop + (availableHeight - placeholderHeight) / 2;
+                    this.placeholderPosition.top = `${topPosition}px`;
+                } else {
+                    this.placeholderPosition.top = `${paddingTop}px`;
+                }
+            }
+
+            this.placeholderPosition.left = `${paddingLeft}px`;
 
             setTimeout(() => {
                 this.noTransition = false;
@@ -561,6 +575,7 @@ export default {
     &__placeholder {
         position: absolute;
         height: fit-content;
+        pointer-events: none;
     }
 }
 </style>

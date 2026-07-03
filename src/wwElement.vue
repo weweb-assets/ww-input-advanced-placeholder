@@ -237,12 +237,7 @@ export default {
             return { ...attrs, ...(this.wwElementState.props.attributes || {}) };
         },
         style() {
-            const style = {
-                ...wwLib.wwUtils.getTextStyleFromContent(this.content),
-                '--placeholder-color': this.content.placeholderColor,
-            };
-            delete style['whiteSpaceCollapse']; //Create a visual bug in Firefox
-            delete style['whiteSpace']; //Create a visual bug in Firefox
+            const style = {};
             INPUT_STYLE_PROPERTIES.forEach(property => {
                 if (this.$attrs?.style?.[property]) {
                     style[property] = this.$attrs?.style?.[property];
@@ -535,6 +530,17 @@ export default {
         border: none;
         background-color: inherit;
         border-radius: inherit;
+        font: inherit;
+        color: inherit;
+        text-align: inherit;
+        text-transform: inherit;
+        text-shadow: inherit;
+        letter-spacing: inherit;
+        word-spacing: inherit;
+        text-decoration: inherit;
+        white-space: var(--ww-text-white-space, initial);
+        overflow: var(--ww-text-overflow, initial);
+        text-overflow: var(--ww-text-text-overflow, initial);
 
         &::placeholder {
             color: var(--placeholder-color, #000000ad);

@@ -92,7 +92,7 @@ export default {
         uid: { type: String, required: true },
         wwElementState: { type: Object, required: true },
     },
-    emits: ['trigger-event', 'add-state', 'remove-state', 'update:content:effect'],
+    emits: ['trigger-event', 'update:content:effect'],
     setup(props) {
         const type = computed(() => {
             if (Object.keys(props.wwElementState.props).includes('type')) {
@@ -301,13 +301,7 @@ export default {
         },
         isReadonly: {
             immediate: true,
-            handler(value) {
-                if (value) {
-                    this.$emit('add-state', 'readonly');
-                } else {
-                    this.$emit('remove-state', 'readonly');
-                }
-
+            handler() {
                 this.$nextTick(() => {
                     this.handleObserver();
                 });
@@ -342,16 +336,6 @@ export default {
             } else if (!isFocused && wasFocused) {
                 this.$emit('trigger-event', { name: 'blur' });
             }
-        },
-        isFocused: {
-            immediate: true,
-            handler(value) {
-                if (value) {
-                    this.$emit('add-state', 'focus');
-                } else {
-                    this.$emit('remove-state', 'focus');
-                }
-            },
         },
         // This is to support legacy advancedPlaceholder
         'content.advancedPlaceholder': {

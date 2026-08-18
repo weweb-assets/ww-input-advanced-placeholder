@@ -546,7 +546,7 @@ export default {
         padding: 0;
         outline: none;
         border: none;
-        background-color: inherit;
+        background-color: transparent;
         border-radius: inherit;
         color: inherit;
         font: inherit;
